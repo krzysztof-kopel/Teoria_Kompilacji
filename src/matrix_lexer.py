@@ -11,7 +11,7 @@ class MatrixLexer(Lexer):
     literals = ["\+", "-", "\*", "/", "=", "<", ">", "(", ")", "[", "]", "{", "}",
                 ":", "'", ",", ";"]
 
-    ignore =
+    ignore = [" ", "\t", r"#.*"]
 
     DOT_PLUS = r".\+"
     DOT_SUB = r".-"
