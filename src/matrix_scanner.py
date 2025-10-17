@@ -6,7 +6,7 @@ class MatrixScanner(Lexer):
     tokens = ["DOT_PLUS", "DOT_SUB", "DOT_MUL", "DOT_DIV",
               "PLUS_ASSIGN", "SUB_ASSIGN", "MUL_ASSIGN", "DIV_ASSIGN",
               "LESS_EQ", "MORE_EQ", "NOT_EQ", "EQ",
-              "ELSE_IF", "IF", "ELSE",  "FOR", "WHILE",
+              "IF", "ELSE",  "FOR", "WHILE",
               "BREAK", "CONTINUE", "RETURN", "EYE", "ZEROS", "ONES",
               "PRINT", "ID", "INT_NUM", "FLOAT_NUM", "STRING"]
 
@@ -14,8 +14,10 @@ class MatrixScanner(Lexer):
                 ":", "'", ",", ";"]
 
     ignore = r" \t"
-    ignore_comment = r"#[^\n]*"
-    ignore_newline = r"\n+"
+    ignore_comment = r"#.*"
+    @_("\n+")
+    def ignore_newline(self, t):
+        self.lineno += len(t.value)
 
     DOT_PLUS = r"\.\+"
     DOT_SUB = r"\.-"
@@ -32,8 +34,6 @@ class MatrixScanner(Lexer):
     NOT_EQ = r"!="
     EQ = r"=="
 
-    ELSE_IF = "else if"
-
     ID = r"[a-zA-Z_][a-zA-Z0-9_]*"
     ID["if"] = "IF"
     ID["break"] = "BREAK"
@@ -47,20 +47,17 @@ class MatrixScanner(Lexer):
     ID["ones"] = "ONES"
     ID["print"] = "PRINT"
 
-    FLOAT_NUM = r"([0-9]+\.[0-9]+E[0-9]+)|([0-9]+\.[0-9]+)|([0-9]+\.)|(\.[0-9]+)"
-    INT_NUM = r"[0-9]+"
-    STRING = r"\"[^\"]+\""
-
-    def INT_NUM(self, t):
-        t.value = int(t.value)
-        return t
-
+    @_(r"([0-9]+\.([0-9]+([eE][+-]?[0-9]+)?)?)|([0-9]*\.[0-9]+([eE][+-][0-9]+)?)")
     def FLOAT_NUM(self, t):
         t.value = float(t.value)
         return t
 
-    def ignore_newline(self, t):
-        self.lineno += len(t.value)
+    @_(r"[0-9]+")
+    def INT_NUM(self, t):
+        t.value = int(t.value)
+        return t
+
+    STRING = r"\"[^\"\n]+\""
 
     def error(self, t):
         self.index += 1
