@@ -22,12 +22,9 @@ if(N<10) {
 else if(N<=15)
     print "N<=15";
 
-while(k>10)
+k = 10;
+while(k>0)
     k = k - 1;
-
-while(k>0) {
-    k = k - 1;
-}
 
 while(k>0) {
     if(k<5)
@@ -56,5 +53,13 @@ for i = 1:N {
     else if(i<=N/2)
         return 0;
 }
+
+
+{
+  N = 100;
+  M = 200;  
+}
+
+
 
 
