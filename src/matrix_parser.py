@@ -4,7 +4,7 @@ from matrix_scanner import MatrixScanner
 class MatrixParser(Parser):
     tokens = MatrixScanner.tokens
 
-    debugfile = 'parser.out'
+    debugfile = '..\\out\\parser.out'
 
     precedence = (
         ("nonassoc", "IFX"),
@@ -16,13 +16,90 @@ class MatrixParser(Parser):
         ("left", "'")
     )
 
+    # Program
+
+    @_('instructions_opt')
+    def program(self, p):
+        pass
+
+    @_('instructions')
+    def instructions_opt(self, p):
+        pass
+
+    @_('')
+    def instructions_opt(self, p):
+        pass
+
+    @_('instructions instruction')
+    def instructions(self, p):
+        pass
+
+    @_('instruction')
+    def instructions(self, p):
+        pass
+
+    @_('"{" instructions "}"')
+    def instruction(self, p):
+        pass
+
+    @_('ID "[" row "]"')
+    def expression(self, p):
+        pass
+
+    @_('ID "=" expression ";"')
+    def instruction(self, p):
+        pass
+
+    @_('ID PLUS_ASSIGN expression ";"',
+       'ID SUB_ASSIGN expression ";"',
+       'ID MUL_ASSIGN expression ";"',
+       'ID DIV_ASSIGN expression ";"')
+    def instruction(self, p):
+        pass
+
+    @_('ID "[" row "]" "=" expression ";"')
+    def instruction(self, p):
+        pass
+
+    @_('PRINT row ";"')
+    def instruction(self, p):
+        pass
+
+    @_('IF "(" expression ")" instruction %prec IFX')
+    def instruction(self, p):
+        pass
+
+    @_('IF "(" expression ")" instruction ELSE instruction')
+    def instruction(self, p):
+        pass
+
+    @_('WHILE "(" expression ")" instruction')
+    def instruction(self, p):
+        pass
+
+    @_('FOR ID "=" expression ":" expression instruction')
+    def instruction(self, p):
+        pass
+
+    @_('BREAK ";"', 'CONTINUE ";"')
+    def instruction(self, p):
+        pass
+
+    @_('RETURN expression ";"')
+    def instruction(self, p):
+        pass
+
+
+
+
+
     @_('INT_NUM', 'FLOAT_NUM', 'ID')
     def expression(self, p):
-        return p[0]
+        pass
 
     @_('"(" expression ")"')
     def expression(self, p):
-        return p.expression
+        pass
 
     @_('expression "+" expression',
        'expression "-" expression',
@@ -39,71 +116,47 @@ class MatrixParser(Parser):
        'expression "<" expression',
        'expression ">" expression')
     def expression(self, p):
-        return p[1], p.expression0, p.expression1
+        pass
 
     @_("expression \"'\"")
     def expression(self, p):
-        return 'TRANSPOSE', p.expression
+        pass
 
     @_('"-" expression %prec MIN_UNI')
     def expression(self, p):
-        return 'UMINUS', p.expression
+        pass
 
     @_('STRING')
     def expression(self, p):
-        return p.STRING
+        pass
 
     # MATRICES AND VECTORS
 
-    @_('"[" rows "]"')
-    def expression(self, p):
-        return p.rows
-
     @_('"[" row "]"')
     def expression(self, p):
-        return p.row
-
-    @_('rows "," "[" row "]"')
-    def rows(self, p):
-        return p.rows + [p.row]
-
-    @_('"[" row "]"')
-    def rows(self, p):
-        return [p.row]
+        pass
 
     @_('row "," expression')
     def row(self, p):
-        return p.row + [p.expression]
+        pass
 
     @_('expression')
     def row(self, p):
-        return [p.expression]
+        pass
 
-    # FUNCTIONS
+    # Functions
 
     @_('ZEROS "(" expression ")"',
        'ONES "(" expression ")"',
        'EYE "(" expression ")"')
     def expression(self, p):
-        return p[0], p.expression
+        pass
 
 
     # Matrix element access
 
-    @_('ID "[" row "]"')
-    def expression(self, p):
-        return 'REF', p.ID, p.row
-
-    # Program
-
-    @_('instructions_opt')
-    def program(self, p):
-        return p.instructions_opt
-
-    @_('instructions')
-    def instructions_opt(self, p):
-        return p.instructions
-
-    @_('')
-    def instructions_opt(self, p):
-        return []
+    def error(self, p):
+        if p:
+            print(f"Syntax error at line {p.lineno}, token={p.type}, value='{p.value}'")
+        else:
+            print("Syntax error at EOF")
