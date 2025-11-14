@@ -153,8 +153,6 @@ class MatrixParser(Parser):
         pass
 
 
-    # Matrix element access
-
     def error(self, p):
         if p:
             print(f"Syntax error at line {p.lineno}, token={p.type}, value='{p.value}'")
