@@ -42,10 +42,6 @@ class MatrixParser(Parser):
     def instruction(self, p):
         pass
 
-    @_('ID "[" row "]"')
-    def expression(self, p):
-        pass
-
     @_('ID "=" expression ";"')
     def instruction(self, p):
         pass
@@ -90,8 +86,9 @@ class MatrixParser(Parser):
         pass
 
 
-
-
+    @_('ID "[" row "]"')
+    def expression(self, p):
+        pass
 
     @_('INT_NUM', 'FLOAT_NUM', 'ID')
     def expression(self, p):

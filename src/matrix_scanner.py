@@ -47,7 +47,7 @@ class MatrixScanner(Lexer):
     ID["ones"] = "ONES"
     ID["print"] = "PRINT"
 
-    @_(r"([0-9]+\.([0-9]+([eE][+-]?[0-9]+)?)?)|([0-9]*\.[0-9]+([eE][+-][0-9]+)?)")
+    @_(r"([0-9]+\.([0-9]*([eE][+-]?[0-9]+)?))|([0-9]*\.[0-9]+([eE][+-]?[0-9]+)?)")
     def FLOAT_NUM(self, t):
         t.value = float(t.value)
         return t
