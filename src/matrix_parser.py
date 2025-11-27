@@ -1,5 +1,6 @@
 from sly import Parser
 from matrix_scanner import MatrixScanner
+import AST
 
 class MatrixParser(Parser):
     tokens = MatrixScanner.tokens
@@ -20,83 +21,86 @@ class MatrixParser(Parser):
 
     @_('instructions_opt')
     def program(self, p):
-        pass
+        return AST.Instructions(p.instructions_opt)
 
     @_('instructions')
     def instructions_opt(self, p):
-        pass
+        return p.instructions
 
     @_('')
     def instructions_opt(self, p):
-        pass
+        return []
 
     @_('instructions instruction')
     def instructions(self, p):
-        pass
+        return p.instructions + [p.instruction]
 
     @_('instruction')
     def instructions(self, p):
-        pass
+        return [p.instruction]
 
     @_('"{" instructions "}"')
     def instruction(self, p):
-        pass
+        return AST.Block(p.instructions)
 
     @_('ID "=" expression ";"')
     def instruction(self, p):
-        pass
+        return AST.Assignment(p[1], p.ID, p.expression)
 
     @_('ID PLUS_ASSIGN expression ";"',
        'ID SUB_ASSIGN expression ";"',
        'ID MUL_ASSIGN expression ";"',
        'ID DIV_ASSIGN expression ";"')
     def instruction(self, p):
-        pass
+        return AST.Assignment(p[1], p.ID, p.expression)
 
     @_('ID "[" row "]" "=" expression ";"')
     def instruction(self, p):
-        pass
+        return AST.Assignment(p[4], AST.IdElements(p[0], p[2]), p.expression)
 
     @_('PRINT row ";"')
     def instruction(self, p):
-        pass
+        return AST.Print(p.row)
 
     @_('IF "(" expression ")" instruction %prec IFX')
     def instruction(self, p):
-        pass
+        return AST.If(p.expression, p.instruction)
 
     @_('IF "(" expression ")" instruction ELSE instruction')
     def instruction(self, p):
-        pass
+        return AST.If(p.expression, p.instruction0, p.instruction1)
 
     @_('WHILE "(" expression ")" instruction')
     def instruction(self, p):
-        pass
+        return AST.While(p.expression, p.instruction)
 
     @_('FOR ID "=" expression ":" expression instruction')
     def instruction(self, p):
-        pass
+        return AST.For(p.ID, p.expression0, p.expression1, p.instruction)
 
     @_('BREAK ";"', 'CONTINUE ";"')
     def instruction(self, p):
-        pass
+        return AST.ControlStatement(p[0])
 
     @_('RETURN expression ";"')
     def instruction(self, p):
-        pass
-
+        return AST.Return(p.expression)
 
     @_('ID "[" row "]"')
     def expression(self, p):
-        pass
+        return AST.IdElements(p.ID, p.row)
 
-    @_('INT_NUM', 'FLOAT_NUM', 'ID')
+    @_('INT_NUM', 'FLOAT_NUM')
     def expression(self, p):
-        pass
+        return AST.Num(p[0])
+
+    @_('ID')
+    def expression(self, p):
+        return AST.Variable(p.ID)
 
     @_('"(" expression ")"')
     def expression(self, p):
-        pass
+        return p.expression
 
     @_('expression "+" expression',
        'expression "-" expression',
@@ -113,33 +117,33 @@ class MatrixParser(Parser):
        'expression "<" expression',
        'expression ">" expression')
     def expression(self, p):
-        pass
+        return AST.BinExpr(p[1], p.expression0, p.expression1)
 
     @_("expression \"'\"")
     def expression(self, p):
-        pass
+        return AST.Transpose(p.expression)
 
     @_('"-" expression %prec MIN_UNI')
     def expression(self, p):
-        pass
+        return AST.UnExpr(p[0], p.expression)
 
     @_('STRING')
     def expression(self, p):
-        pass
+        return AST.String(p.STRING)
 
     # MATRICES AND VECTORS
 
     @_('"[" row "]"')
     def expression(self, p):
-        pass
+        return AST.Vector(p.row)
 
     @_('row "," expression')
     def row(self, p):
-        pass
+        return p.row + [p.expression]
 
     @_('expression')
     def row(self, p):
-        pass
+        return [p.expression]
 
     # Functions
 
@@ -147,7 +151,7 @@ class MatrixParser(Parser):
        'ONES "(" expression ")"',
        'EYE "(" expression ")"')
     def expression(self, p):
-        pass
+        return AST.Function(p[0], p.expression)
 
 
     def error(self, p):
