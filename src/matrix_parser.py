@@ -121,7 +121,7 @@ class MatrixParser(Parser):
 
     @_("expression \"'\"")
     def expression(self, p):
-        return AST.UnExpr(p[1], p.expression)
+        return AST.UnExpr("TRANSPOSE", p.expression)
 
     @_('"-" expression %prec MIN_UNI')
     def expression(self, p):
