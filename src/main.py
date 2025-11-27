@@ -7,12 +7,11 @@ with open(f"..\\tests\\{file_name}") as file:
     program_text = file.read()
 
 lexer = MatrixScanner()
-tokens = lexer.tokenize(program_text)
-for token in tokens:
+for token in lexer.tokenize(program_text):
     if str(token.type) != "ERROR":
         print(f"({token.lineno}): {token.type}({token.value})")
     else:
         print(f"Error: unknown token starting at {token.value[0:min(5, len(token.value), token.value.find("\n"))]}")
 
 parser = MatrixParser()
-parser.parse(tokens)
+parser.parse(lexer.tokenize(program_text))
