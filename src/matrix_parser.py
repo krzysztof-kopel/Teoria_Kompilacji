@@ -1,8 +1,10 @@
 from sly import Parser
 from matrix_scanner import MatrixScanner
-import AST
+import AST, TreePrinter
 
 class MatrixParser(Parser):
+    def __init__(self):
+        self.error_occurred = False
     tokens = MatrixScanner.tokens
 
     debugfile = '..\\out\\parser.out'
@@ -76,7 +78,7 @@ class MatrixParser(Parser):
 
     @_('FOR ID "=" expression ":" expression instruction')
     def instruction(self, p):
-        return AST.For(p.ID, p.expression0, p.expression1, p.instruction)
+        return AST.For(AST.Variable(p.ID), p.expression0, p.expression1, p.instruction)
 
     @_('BREAK ";"', 'CONTINUE ";"')
     def instruction(self, p):
@@ -156,6 +158,7 @@ class MatrixParser(Parser):
 
     def error(self, p):
         if p:
+            self.error_occurred = True
             print(f"Syntax error at line {p.lineno}, token={p.type}, value='{p.value}'")
         else:
             print("Syntax error at EOF")

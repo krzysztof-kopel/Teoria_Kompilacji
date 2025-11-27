@@ -14,4 +14,8 @@ for token in lexer.tokenize(program_text):
         print(f"Error: unknown token starting at {token.value[0:min(5, len(token.value), token.value.find("\n"))]}")
 
 parser = MatrixParser()
-parser.parse(lexer.tokenize(program_text))
+tokens = parser.parse(lexer.tokenize(program_text))
+
+if not parser.error_occurred:
+    print("Abstract syntax tree:")
+    tokens.printTree()

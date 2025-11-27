@@ -3,11 +3,11 @@
 class Node(object):
     pass
 
-class Instructions:
+class Instructions(Node):
     def __init__(self, instructions):
         self.instructions = instructions
 
-class Block:
+class Block(Node):
     def __init__(self, instructions):
         self.instructions = instructions
 
