@@ -71,10 +71,6 @@ class Return(Node):
     def __init__(self, expression):
         self.expression = expression
 
-class Transpose(Node):
-    def __init__(self, expression):
-        self.expression = expression
-
 class String(Node):
     def __init__(self, content):
         self.content = content

@@ -56,7 +56,7 @@ class MatrixParser(Parser):
 
     @_('ID "[" row "]" "=" expression ";"')
     def instruction(self, p):
-        return AST.Assignment(p[4], AST.IdElements(p[0], p[2]), p.expression)
+        return AST.Assignment(p[4], AST.IdElements(p.ID, p.row), p.expression)
 
     @_('PRINT row ";"')
     def instruction(self, p):
@@ -121,7 +121,7 @@ class MatrixParser(Parser):
 
     @_("expression \"'\"")
     def expression(self, p):
-        return AST.Transpose(p.expression)
+        return AST.UnExpr(p[1], p.expression)
 
     @_('"-" expression %prec MIN_UNI')
     def expression(self, p):
