@@ -84,9 +84,10 @@ class Function(Node):
         self.func_name = func_name
         self.arguments = arguments
 
-# ...
-# fill out missing classes
-# ...
+class ID(Node):
+    def __init__(self, var_name, row_parameters=None):
+        self.var_name = var_name
+        self.row_parameters = row_parameters
 
 class Error(Node):
     def __init__(self):

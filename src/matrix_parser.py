@@ -47,14 +47,14 @@ class MatrixParser(Parser):
 
     @_('ID "=" expression ";"')
     def instruction(self, p):
-        return AST.Assignment(p[1], p.ID, p.expression)
+        return AST.Assignment(p[1], AST.ID(p.ID), p.expression)
 
     @_('ID PLUS_ASSIGN expression ";"',
        'ID SUB_ASSIGN expression ";"',
        'ID MUL_ASSIGN expression ";"',
        'ID DIV_ASSIGN expression ";"')
     def instruction(self, p):
-        return AST.Assignment(p[1], p.ID, p.expression)
+        return AST.Assignment(p[1], AST.ID(p.ID), p.expression)
 
     @_('ID "[" row "]" "=" expression ";"')
     def instruction(self, p):
