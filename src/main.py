@@ -16,6 +16,6 @@ for token in lexer.tokenize(program_text):
 parser = MatrixParser()
 tokens = parser.parse(lexer.tokenize(program_text))
 
-if not parser.error_occurred:
+if not parser.error_occurred and tokens is not None:
     print("Abstract syntax tree:")
     tokens.printTree()
