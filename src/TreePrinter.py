@@ -55,11 +55,7 @@ class TreePrinter:
         TreePrinter.print_indent_prefix(indent)
         print(self.op)
 
-        if isinstance(self.ident, str):
-            TreePrinter.print_indent_prefix(indent + 1)
-            print(self.ident)
-        else:
-            self.ident.printTree(indent + 1)
+        self.ident.printTree(indent + 1)
         self.expression.printTree(indent + 1)
 
     @addToClass(AST.IdElements)
@@ -140,4 +136,12 @@ class TreePrinter:
         TreePrinter.print_indent_prefix(indent)
         print(self.func_name)
         self.arguments.printTree(indent + 1)
+
+    @addToClass(AST.ID)
+    def printTree(self, indent=0):
+        TreePrinter.print_indent_prefix(indent)
+        print(self.var_name)
+        # if self.row_parameters is not None:
+        #     for param in self.row_parameters:
+        #         param.printTree(indent + 1)
 
