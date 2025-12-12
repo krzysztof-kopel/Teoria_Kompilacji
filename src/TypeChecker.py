@@ -15,14 +15,14 @@ class NodeVisitor(object):
         if isinstance(node, list):
             for elem in node:
                 self.visit(elem)
-        else:
-            for child in node.children:
-                if isinstance(child, list):
-                    for item in child:
+        elif hasattr(node, "__dict__"):
+            for value in node.__dict__.values():
+                if isinstance(value, list):
+                    for item in value:
                         if isinstance(item, AST.Node):
                             self.visit(item)
-                elif isinstance(child, AST.Node):
-                    self.visit(child)
+                elif isinstance(value, AST.Node):
+                    self.visit(value)
 
     # simpler version of generic_visit, not so general
     #def generic_visit(self, node):
@@ -35,10 +35,17 @@ class TypeChecker(NodeVisitor):
     def __init__(self):
         self.table = SymbolTable(None, "global")
         self.loop_nesting = 0
+        self.error_occurred = False
 
     def print_error(self, node, msg):
+        self.error_occurred = True
         lineno = getattr(node, 'lineno', '?')
         print(f"Line {lineno}: {msg}")
+
+
+    def visit_Instructions(self, node):
+        for instruction in node.instructions:
+            self.visit(instruction)
 
     def visit_BinExpr(self, node):
                                           # alternative usage,
@@ -81,7 +88,7 @@ class TypeChecker(NodeVisitor):
         definition = self.table.get(node.name)
 
         if definition is not None:
-            return definition.type
+            return definition.element_type
 
         self.print_error(node, f"Variable '{node.name}' not defined")
         return None
@@ -118,7 +125,7 @@ class TypeChecker(NodeVisitor):
         symbol = self.table.get(node.var_name)
 
         if symbol:
-            return symbol.type
+            return symbol.element_type
         else:
             self.print_error(node, f"Variable '{node.var_name}' not defined")
             return None
@@ -166,3 +173,32 @@ class TypeChecker(NodeVisitor):
         else:
             self.print_error(node, f"Function argument has type '{arg_type}', should have int")
             return None
+
+    def visit_While(self, node):
+        self.loop_nesting += 1
+
+        self.visit(node.expression)
+        self.visit(node.instruction)
+
+        self.loop_nesting -= 1
+
+    def visit_For(self, node):
+        self.table = self.table.pushScope("loop")
+        self.loop_nesting += 1
+
+        self.table.put(node.iterator.name, VariableSymbol(node.iterator.name, 'int'))
+
+        self.visit(node.range_start)
+        self.visit(node.range_end)
+        self.visit(node.content)
+
+        self.loop_nesting -= 1
+        self.table = self.table.popScope()
+
+    def visit_ControlStatement(self, node):
+        if self.loop_nesting == 0:
+            self.print_error(node, f"Instruction '{node.instr}' found outside loop")
+
+    def visit_Return(self, node):
+        if node.expression is not None:
+            self.visit(node.expression)

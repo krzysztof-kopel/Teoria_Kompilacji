@@ -47,7 +47,9 @@ class MatrixParser(Parser):
 
     @_('ID "=" expression ";"')
     def instruction(self, p):
-        return AST.Assignment(p[1], AST.ID(p.ID), p.expression)
+        node = AST.Assignment(p[1], AST.ID(p.ID), p.expression)
+        node.lineno = p.lineno
+        return node
 
     @_('ID PLUS_ASSIGN expression ";"',
        'ID SUB_ASSIGN expression ";"',
@@ -82,7 +84,9 @@ class MatrixParser(Parser):
 
     @_('BREAK ";"', 'CONTINUE ";"')
     def instruction(self, p):
-        return AST.ControlStatement(p[0])
+        node = AST.ControlStatement(p[0])
+        node.lineno = p.lineno
+        return node
 
     @_('RETURN expression ";"')
     def instruction(self, p):
@@ -98,7 +102,9 @@ class MatrixParser(Parser):
 
     @_('ID')
     def expression(self, p):
-        return AST.Variable(p.ID)
+        node = AST.Variable(p.ID)
+        node.lineno = p.lineno
+        return node
 
     @_('"(" expression ")"')
     def expression(self, p):
@@ -119,7 +125,9 @@ class MatrixParser(Parser):
        'expression "<" expression',
        'expression ">" expression')
     def expression(self, p):
-        return AST.BinExpr(p[1], p.expression0, p.expression1)
+        node = AST.BinExpr(p[1], p.expression0, p.expression1)
+        node.lineno = p.lineno
+        return node
 
     @_("expression \"'\"")
     def expression(self, p):
@@ -137,7 +145,9 @@ class MatrixParser(Parser):
 
     @_('"[" row "]"')
     def expression(self, p):
-        return AST.Vector(p.row)
+        node = AST.Vector(p.row)
+        node.lineno = p.lineno
+        return node
 
     @_('row "," expression')
     def row(self, p):
