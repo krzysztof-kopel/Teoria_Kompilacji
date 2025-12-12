@@ -60,7 +60,7 @@ class MatrixParser(Parser):
 
     @_('ID "[" row "]" "=" expression ";"')
     def instruction(self, p):
-        return AST.Assignment(p[4], AST.IdElements(p.ID, p.row), p.expression)
+        return AST.Assignment(p[4], AST.ID(p.ID, p.row), p.expression)
 
     @_('PRINT row ";"')
     def instruction(self, p):
