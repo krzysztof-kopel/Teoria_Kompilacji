@@ -94,7 +94,7 @@ class MatrixParser(Parser):
 
     @_('ID "[" row "]"')
     def expression(self, p):
-        return AST.IdElements(p.ID, p.row)
+        return AST.ID(p.ID, p.row)
 
     @_('INT_NUM', 'FLOAT_NUM')
     def expression(self, p):

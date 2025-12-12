@@ -36,11 +36,6 @@ class Assignment(Node):
         self.ident = ident
         self.expression = expression
 
-class IdElements(Node):
-    def __init__(self, ident, elements):
-        self.ident = ident
-        self.elements = elements
-
 class Print(Node):
     def __init__(self, to_print):
         self.to_print = to_print
