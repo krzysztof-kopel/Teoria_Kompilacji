@@ -2,7 +2,7 @@
 import AST
 from SymbolTable import SymbolTable, VariableSymbol
 
-
+# TODO: make it work on opers.m
 class NodeVisitor(object):
 
     def visit(self, node):
@@ -50,12 +50,15 @@ class TypeChecker(NodeVisitor):
     def visit_BinExpr(self, node):
                                           # alternative usage,
                                           # requires definition of accept method in class Node
-        type1 = self.visit(node.left)     # type1 = node.left.accept(self) 
-        type2 = self.visit(node.right)    # type2 = node.right.accept(self)
+        res1 = self.visit(node.left)     # type1 = node.left.accept(self)
+        res2 = self.visit(node.right)    # type2 = node.right.accept(self)
         op    = node.op
 
-        if type1 is None or type2 is None:
+        if res1 is None or res2 is None:
             return None
+
+        type1, size1 = res1 if isinstance(res1, tuple) else (res1, None)
+        type2, size2 = res2 if isinstance(res2, tuple) else (res2, None)
 
         if type1 == "string" or type2 == "string":
             if type1 == "string" and type2 == "string" and op == "+":
@@ -69,7 +72,13 @@ class TypeChecker(NodeVisitor):
                 self.print_error(node, f"Incompatible types for '{op}': {type1} & {type2}")
                 return None
 
-            return "matrix"
+            if size1 is not None and size2 is not None:
+                if op in ["+", "-", ".+", ".-", ".*", "./"]:
+                    if size1 != size2:
+                        self.print_error(node, f"Matrix dimension mismatch: {size1} vs {size2}")
+                        return None
+
+            return "matrix", size1
 
         if type1 == "int" and type2 == "int":
             return "int"
@@ -88,21 +97,30 @@ class TypeChecker(NodeVisitor):
         definition = self.table.get(node.name)
 
         if definition is not None:
+            if definition.element_type == "matrix":
+                return "matrix", definition.size
             return definition.element_type
 
         self.print_error(node, f"Variable '{node.name}' not defined")
         return None
 
     def visit_Assignment(self, node):
-        type_rhs = self.visit(node.expression)
+        rhs_result = self.visit(node.expression)
 
-        if type_rhs is None:
+        if rhs_result is None:
             return None
+
+        size_rhs = None
+        if isinstance(rhs_result, tuple):
+            type_rhs, size_rhs = rhs_result
+        else:
+            type_rhs, rhs_size = rhs_result, None
+
 
         if node.op == "=":
             if isinstance(node.ident, AST.ID):
                 var_name = node.ident.var_name
-                self.table.put(var_name, VariableSymbol(var_name, type_rhs))
+                self.table.put(var_name, VariableSymbol(var_name, type_rhs, size_rhs))
 
             elif isinstance(node.ident, AST.IdElements):
                 type_lhs = self.visit(node.ident)
@@ -146,6 +164,10 @@ class TypeChecker(NodeVisitor):
             self.print_error(node, f"Variable '{matrix_name}' is not a matrix")
             return None
 
+        if len(node.elements) > 2:
+            self.print_error(node, f"Matrix reference has too many indices ({len(node.elements)}), max 2 allowed")
+
+
         if node.elements:
             for idx in node.elements:
                 idx_type = self.visit(idx)
@@ -168,8 +190,13 @@ class TypeChecker(NodeVisitor):
 
     def visit_Function(self, node):
         arg_type = self.visit(node.arguments)
+
+        size_val = None
+        if isinstance(node.arguments, AST.Num):
+            size_val = node.arguments.value
+
         if arg_type == "int":
-            return "matrix"
+            return "matrix", (size_val, size_val)
         else:
             self.print_error(node, f"Function argument has type '{arg_type}', should have int")
             return None
