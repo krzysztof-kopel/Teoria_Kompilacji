@@ -186,7 +186,7 @@ class TypeChecker(NodeVisitor):
                 elif len(vector_element.elements) != length:
                     self.print_error(node, f"Matrix has rows of different sizes")
                     return None
-        return "vector"
+        return "vector" if length is None else "matrix", (len(node.elements), length)
 
     def visit_Function(self, node):
         arg_type = self.visit(node.arguments)
