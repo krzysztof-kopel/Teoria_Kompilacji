@@ -1,5 +1,6 @@
-from src.matrix_scanner import MatrixScanner
-from src.matrix_parser import MatrixParser
+from Interpreter import Interpreter
+from matrix_scanner import MatrixScanner
+from matrix_parser import MatrixParser
 from TypeChecker import TypeChecker
 
 file_name = input("File with code: ").strip()
@@ -27,3 +28,6 @@ if not parser.error_occurred and ast is not None:
         print("No type errors found", end="\n\n")
         print("Abstract syntax tree:")
         ast.printTree()
+        print("\nStarting program execution...", end="\n\n")
+        interpreter = Interpreter()
+        interpreter.visit(ast)

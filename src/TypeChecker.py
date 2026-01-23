@@ -63,6 +63,8 @@ class TypeChecker(NodeVisitor):
         if type1 == "string" or type2 == "string":
             if type1 == "string" and type2 == "string" and op == "+":
                 return "string"
+            elif type1 == "string" and type2 == "int" and op == "*":
+                return "string"
             else:
                 self.print_error(node, f"Cannot use operator {op} with strings")
                 return None
