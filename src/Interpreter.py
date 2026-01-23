@@ -72,7 +72,7 @@ class Interpreter(object):
 
     @when(AST.IdElements)
     def visit(self, node):
-        matrix = self.memory_stack.get(node.ident.var_name)
+        matrix = self.memory_stack.get(node.ident)
         indices = tuple(self.visit(i) for i in node.elements)
 
         return matrix[indices]
