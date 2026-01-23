@@ -59,7 +59,7 @@ class Interpreter(object):
                 new_val = self.op_dict[oper](old_val, self.visit(node.expression))
                 self.memory_stack.set(name, new_val)
         elif isinstance(node.ident, AST.IdElements):
-            matrix = self.memory_stack.get(node.ident.ident.var_name)
+            matrix = self.memory_stack.get(node.ident.ident)
             indices = tuple(self.visit(i) for i in node.ident.elements)
 
             if node.op == "=":
